@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-and-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package and dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
+
+      - name: Run tests
+        run: pytest -q
+
+      - name: Fixed smoke run
+        run: |
+          python -m src.experiments.run --config configs/colab_smoke.json --mode fixed --provider classical --output results/runs
+
+      - name: Adaptive smoke run
+        run: |
+          python -m src.experiments.run --config configs/colab_smoke.json --mode adaptive --provider classical --output results/runs
+
+      - name: Paired benchmark smoke run
+        run: |
+          python -m src.experiments.run --config configs/colab_smoke.json --benchmark paired --provider classical --seeds 0 1 --output results/runs
+
+      - name: Verify outputs exist
+        run: |
+          test -d results/runs
+          find results/runs -name summary.json | grep -q summary.json

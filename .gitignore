@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+results/runs/**
+!results/runs/.gitkeep
+results/figures/**
+!results/figures/.gitkeep
+results/summaries/**
+!results/summaries/.gitkeep
